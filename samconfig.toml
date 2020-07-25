@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "wojtek-link-shortener"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-sjki9r6gsyl5"
+s3_prefix = "wojtek-link-shortener"
+region = "eu-central-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+

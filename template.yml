@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform: AWS::Serverless-2016-10-31
+
+Globals:
+    Function:
+        Runtime: go1.x
+
+Resources:
+    RedirectCreator:
+        Type: AWS::Serverless::Function
+        Properties:
+            CodeUri: ./src/functions/redirect
+            Handler: main
+            
+            Environment:
+                Variables:
+                    BUCKET_NAME: !Ref HostingBucket
+                    BUCKET_DOMAIN: !GetAtt HostingBucket.WebsiteURL
+            Policies:
+                - S3WritePolicy:
+                      BucketName: !Ref HostingBucket
+            Events:
+                HttpEvent:
+                    Type: HttpApi
+                    Properties:
+                        Path: /
+                        Method: POST
+            
+    HostingBucket:
+        Type: AWS::S3::Bucket
+        Properties:
+            BucketName: !Sub "${AWS::StackName}-bucket"
+            WebsiteConfiguration:
+                ErrorDocument: index.html
+                IndexDocument: index.html
+            
+    BucketPolicy:
+        Type: AWS::S3::BucketPolicy
+        Properties:
+            Bucket: !Ref HostingBucket
+            PolicyDocument:
+                Statement:
+                    - Effect: Allow
+                      Action: s3:GetObject
+                      Resource: !Sub "arn:aws:s3:::${HostingBucket}/*"
+                      Principal: "*"
+            
